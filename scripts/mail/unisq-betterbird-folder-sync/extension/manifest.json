@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "UniSQ Folder Sync",
+  "version": "1.1.1",
+  "description": "Creates missing UniSQ study folders requested by unisq-mail-sync.py.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "unisq-folder-sync@local"
+    }
+  },
+  "permissions": [
+    "accountsRead",
+    "accountsFolders",
+    "nativeMessaging"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "action": {
+    "default_title": "UniSQ Folder Sync",
+    "default_label": "UniSQ Folder Sync",
+    "allowed_spaces": [
+      "mail"
+    ]
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  }
+}

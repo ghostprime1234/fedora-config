@@ -12,4 +12,9 @@ CMakeFiles
 UOW/
 .Trash*
 
-backups/**
+# Generated backup directories - never sync as working data
+archives/
+backups/
+snapshot/
+snapshots/
+legacy_full_snapshots/
