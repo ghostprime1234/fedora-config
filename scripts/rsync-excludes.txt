@@ -1,0 +1,26 @@
+.stfolder
+.stversions
+.ipynb_checkpoints
+__pycache__
+.venv
+cmake-build-debug
+CMakeFiles
+.~lock.*
+.~lock.*#
+.DS_Store
+*.tmp
+UOW/
+.Trash*
+
+# Generated backup directories - never sync as working data
+archives/
+backups/
+snapshot/
+snapshots/
+legacy_full_snapshots/
+
+# Exclude CSC6002 Assessment 1 raw dataset
+**/61499v001/**
+
+# Exclude CSC6002 Assessment 1 raw dataset
+**/61499v001/**

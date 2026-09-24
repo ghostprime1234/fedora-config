@@ -109,7 +109,7 @@ printf -v REMOTE_NESTING_TEST 'test -d %q' "${REMOTE_PATH}/University"
 USB_LIVE_WORK="${LOCAL_VAULT}/Live_Work"
 VAULT_MOUNT="/mnt/MDS_VAULT"
 VAULT_UUID="a358df98-79a1-42fb-af5c-d38f43c60305"
-DATA_UUID="5ae96703-ba78-4401-9c92-9d06dd52589d"
+DATA_UUID="${DATA_UUID:-b6ef847d-4259-4089-bc6a-f5552df0b2ab}"
 
 # ==============================================================================
 # 2. GUARDIAN LAYER
