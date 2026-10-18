@@ -1,0 +1,8 @@
+- .git/**
+- .sync/**
+- .stversions/**
+- **.tmp
+- **.crswap
+- __pycache__/**
+- .venv/**
+- node_modules/**

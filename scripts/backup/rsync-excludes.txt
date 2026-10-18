@@ -18,3 +18,11 @@ backups/
 snapshot/
 snapshots/
 legacy_full_snapshots/
+*.sync-conflict-*
+.trash/
+.idea/
+.vscode/
+.venv/
+__pycache__/
+*.pyc
+*.tmp
