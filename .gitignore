@@ -25,3 +25,8 @@ sync_status.txt
 # Local archives/snapshots if created inside repo
 *.tar.gz
 hosts/rsync_output.txt
+
+# Automation credentials and tokens
+scripts/automations/credentials.json
+scripts/automations/token.json
+scripts/automations/.vscode/

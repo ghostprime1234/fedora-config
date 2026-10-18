@@ -1,0 +1,117 @@
+{
+  "output_dir": "~/Documents/Invoices",
+  "folder_cleanup_policies": [
+    {
+      "label": "Promotions",
+      "retention_days": 30
+    },
+    {
+      "label": "Careers/Alerts",
+      "retention_days": 14
+    },
+    {
+      "label": "Tech & Newsletters",
+      "retention_days": 30
+    },
+    {
+      "label": "Networking & Invites",
+      "retention_days": 30
+    },
+    {
+      "label": "Support Tickets",
+      "retention_days": 60
+    }
+  ],
+  "promo_senders": [
+    "kogan.com",
+    "aliexpress.com",
+    "cinebuzz",
+    "strandbags",
+    "bestandless",
+    "redrooster",
+    "iselect",
+    "supercheapauto",
+    "everydayrewards",
+    "myunidays",
+    "stockland",
+    "quora.com",
+    "screenrant.com",
+    "calm.com",
+    "bunnings",
+    "scorptec",
+    "hp",
+    "ebgames.com.au",
+    "carsales.com.au",
+    "subcard",
+    "compareclub.com.au",
+    "mynetdiary.net",
+    "theathletesfoot.com.au",
+    "boost.com.au",
+    "revolut.com",
+    "playstation",
+    "healthengine.com.au"
+  ],
+  "organization_rules": [
+    {
+      "label": "Careers/Alerts",
+      "query": "in:inbox (from:\"LinkedIn Job Alerts\" OR from:\"Hire Feed via LinkedIn\" OR from:\"SEEK Recommendations\" OR subject:\"is hiring\" OR subject:\"Last chance to apply\")",
+      "archive": true
+    },
+    {
+      "label": "Careers/Applications",
+      "query": "in:inbox (from:westpac OR from:abs@nga.net.au OR from:Sonja.Girazova OR from:outlier.ai OR subject:\"interview\" OR subject:\"assessment centre\" OR subject:\"Referee Update\" OR subject:\"Graduate Program\" OR subject:\"Working with Children\")",
+      "archive": false
+    },
+    {
+      "label": "Tech & Newsletters",
+      "query": "in:inbox (from:spiceworks OR from:medium.com OR from:educative OR from:academia.edu OR from:ovhcloud OR from:cloudflare OR from:xda-developers.com OR from:howtogeek.com OR from:roadmap.sh OR from:gitguardian.com OR from:\"PDF By\" OR from:\"For Michael to Read\" OR from:\"Michael’s Library\" OR subject:\"PDF By\" OR subject:\"related to your reading\")",
+      "archive": true
+    },
+    {
+      "label": "Networking & Invites",
+      "query": "in:inbox (subject:\"I want to connect\" OR subject:\"invitation to connect\")",
+      "archive": true
+    },
+    {
+      "label": "Government & Official",
+      "query": "in:inbox (from:my.gov.au OR from:onegov.nsw.gov.au OR from:equifax.com)",
+      "archive": true
+    },
+    {
+      "label": "Security & System Alerts",
+      "query": "in:inbox (from:bitdefender.com OR from:netflix.com OR subject:\"Google Account\" OR subject:\"Inactive Account Manager\" OR subject:\"installed on\")",
+      "archive": true
+    },
+    {
+      "label": "Model Aero Club",
+      "query": "in:inbox (from:southernhighlandsmac@gmail.com OR from:aeromodellers OR subject:\"SHMAC\" OR subject:\"MAAA\" OR subject:\"Aeromodellers NSW\" OR subject:\"ANSW\")",
+      "archive": true
+    },
+    {
+      "label": "Support & Health",
+      "query": "in:inbox (from:weflex.com.au OR from:mable.com.au OR from:mable OR from:ahm.com.au OR from:specsavers OR from:pacificsmiles OR from:\"Bridget Haywood\" OR subject:\"WeFlex\" OR subject:\"Bridget Haywood\" OR subject:\"Wollongong Private Hospital\" OR subject:\"Daily Living Skills\" OR subject:\"Strategies List\")",
+      "archive": true
+    },
+    {
+      "label": "Education & Training",
+      "query": "in:inbox (from:techskills.edu.au OR from:unisq.edu.au OR from:unsw.edu.au OR from:tafensw.edu.au OR from:jetbrains OR from:dataquest.io OR subject:\"TechSkills\" OR subject:\"UniSQ\" OR subject:\"JetBrains\")",
+      "archive": true
+    },
+    {
+      "label": "Orders & Receipts",
+      "query": "in:inbox (from:auspost OR from:dragonfly OR from:computeralliance.com.au OR subject:\"tracking\" OR subject:\"your parcel\" OR subject:\"order confirmation\" OR subject:\"order has been received\")",
+      "archive": true
+    },
+    {
+      "label": "Support Tickets",
+      "query": "in:inbox (from:corsair OR from:escapenet OR subject:\"[Corsair]\" OR subject:\"[EscapeNet\")",
+      "archive": true
+    },
+    {
+      "label": "Family",
+      "query": "in:inbox (from:\"Val McMillan\" OR from:\"Valerie McMillan\")",
+      "archive": false
+    }
+  ],
+  "invoice_download_query": "has:attachment (filename:pdf OR filename:zip) (subject:invoice OR subject:bill OR subject:statement OR \"tax invoice\")"
+}
