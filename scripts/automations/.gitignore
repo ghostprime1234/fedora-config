@@ -1,0 +1,11 @@
+
+# Sensitive OAuth and environment files
+token.json
+credentials.json
+client_secret_*.json
+.env
+
+# Editor swap files and caches
+*.swp
+*.kate-swp
+__pycache__/
