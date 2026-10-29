@@ -1,6 +1,5 @@
 {
   "output_dir": "~/Documents/Invoices",
-  "gemini_api_key_env": "GEMINI_API_KEY",
   "folder_cleanup_policies": [
     {
       "label": "Promotions",
@@ -28,7 +27,7 @@
       "label": "TRASH",
       "query": "in:inbox older_than:1d (subject:\"security code\" OR subject:\"Reset password\" OR subject:\"Account Recovery Code\" OR subject:\"Verify the email address\" OR subject:\"one-time password\" OR subject:\"verification code\")",
       "archive": true
-    }
+    },
     {
       "label": "Careers/Applications",
       "query": "in:inbox (from:westpac OR from:abs@nga.net.au OR from:outlier.ai OR from:indeed.com OR subject:\"CEX - Sales Assistant\")",
