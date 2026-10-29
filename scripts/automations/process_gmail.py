@@ -22,6 +22,22 @@ BASE_DIR = Path(__file__).parent
 CONFIG_FILE = BASE_DIR / "rules.json"
 BATCH_SIZE = 1000
 
+PROTECTED_SENDERS = [
+    "abs.gov.au",
+    "nga.net.au",
+    "westpac",
+    "outlier.ai",
+    "indeed.com",
+    "mable.com.au",
+    "unisq.edu.au",
+    "up.com.au",
+    "hcf.com.au",
+]
+
+def is_protected(sender: str) -> bool:
+    sender_lower = sender.lower()
+    return any(p in sender_lower for p in PROTECTED_SENDERS)
+
 VALID_CATEGORIES = [
     "Promotions",
     "Tech & Newsletters",
@@ -32,7 +48,6 @@ VALID_CATEGORIES = [
     "Support & Health",
     "Orders & Receipts",
     "Support Tickets",
-    "TRASH",
     "INBOX_KEEP",
 ]
 
@@ -120,6 +135,8 @@ def classify_with_ollama(prompt: str) -> dict:
         "format": "json",
         "options": {"temperature": 0.1},
     }
+
+    
     req = urllib.request.Request(
         LOCAL_OLLAMA_URL,
         data=json.dumps(payload).encode("utf-8"),
@@ -347,139 +364,29 @@ def organize_inbox_rules(service, config, label_cache):
 
     print("  ✓ Rule-based organization complete.")
 
-
-def is_ollama_running() -> bool:
-    try:
-        req = urllib.request.Request("http://localhost:11434/api/tags")
-        with urllib.request.urlopen(req, timeout=1) as resp:
-            return resp.status == 200
-    except Exception:
-        return False
-
-
-def ensure_ollama_ready() -> bool:
-    """Starts Ollama daemon and pulls the model if missing."""
-    if not shutil.which("ollama"):
-        return False  # Ollama not installed (e.g., laptop environment)
-
-    # 1. Start daemon if not running
-    if not is_ollama_running():
-        print("  Starting local Ollama server...")
-        subprocess.Popen(
-            ["ollama", "serve"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            start_new_session=True,
-        )
-        for _ in range(12):
-            time.sleep(0.5)
-            if is_ollama_running():
-                break
-
-    if not is_ollama_running():
-        print("  Failed to connect to local Ollama.")
-        return False
-
-    # 2. Verify model exists or pull it
-    try:
-        req = urllib.request.Request("http://localhost:11434/api/tags")
-        with urllib.request.urlopen(req, timeout=3) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            installed_names = [m.get("name", "") for m in data.get("models", [])]
-            target_base = LOCAL_MODEL.split(":")[0]
-
-            has_model = any(
-                LOCAL_MODEL == name or target_base == name.split(":")[0]
-                for name in installed_names
-            )
-            if not has_model:
-                print(f"  Model '{LOCAL_MODEL}' not found. Downloading via Ollama...")
-                subprocess.run(["ollama", "pull", LOCAL_MODEL], check=True)
-                print(f"  ✓ Model '{LOCAL_MODEL}' downloaded successfully.")
-        return True
-    except Exception as e:
-        print(f"  Ollama model verification failed: {e}")
-        return False
-
-
 def build_triage_prompt(emails_metadata: list) -> str:
     return f"""
 Analyze the email metadata below and categorize each into EXACTLY one of these labels:
 {json.dumps(VALID_CATEGORIES)}
 
 Categories Guide:
-- 'TRASH': Expired security/verification codes, one-time passwords, password reset links, expired webinar replays, transient app error notices.
 - 'Promotions': Marketing deals, discounts, consumer sales, newsletters you did not explicitly work with.
 - 'Tech & Newsletters': Engineering blogs, programming digests, GitHub repository updates.
 - 'Careers/Alerts': Job notifications, LinkedIn alerts, recruiter inquiries.
+- 'Careers/Applications': Application updates, interview invites, employer replies.
 - 'Orders & Receipts': Order confirmations, receipts, delivery tracking, parcel updates.
 - 'Security & System Alerts': Cloud platform notifications, account notices, subscription changes.
 - 'Support & Health': Medical, health insurance, therapy, dental, NDIS support.
-- 'INBOX_KEEP': Direct personal communications, active threads Michael must read.
+- 'INBOX_KEEP': Direct personal communications, messages requiring action or reply, or any email you are uncertain about.
+
+RULE: If you are unsure, ALWAYS classify as 'INBOX_KEEP'.
 
 Emails to classify:
 {json.dumps(emails_metadata)}
 
 Respond ONLY with a JSON object mapping each message ID to its assigned label string.
-Example: {{"msg_id_1": "Promotions", "msg_id_2": "TRASH"}}
+Example: {{"msg_id_1": "Promotions", "msg_id_2": "INBOX_KEEP"}}
 """
-
-
-def classify_with_ollama(prompt: str) -> dict:
-    payload = {
-        "model": LOCAL_MODEL,
-        "prompt": prompt,
-        "stream": False,
-        "format": "json",
-        "options": {"temperature": 0.1},
-    }
-    req = urllib.request.Request(
-        LOCAL_OLLAMA_URL,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-    )
-    with urllib.request.urlopen(req, timeout=15) as resp:
-        data = json.loads(resp.read().decode("utf-8"))
-        return json.loads(data.get("response", "{}"))
-
-
-def classify_with_gemini_api(prompt: str, api_key: str) -> dict:
-    from google import genai
-
-    client = genai.Client(api_key=api_key)
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-        config={"response_mime_type": "application/json"},
-    )
-    return json.loads(response.text)
-
-
-def classify_inbox_items(emails_metadata: list) -> dict:
-    prompt = build_triage_prompt(emails_metadata)
-
-    # 1. Try local Ollama first (auto-start daemon & pull model if installed)
-    if ensure_ollama_ready():
-        try:
-            decisions = classify_with_ollama(prompt)
-            if decisions:
-                print("  ✓ Processed via local Ollama.")
-                return decisions
-        except Exception as e:
-            print(f"  Local Ollama execution error: {e}")
-
-    # 2. Fall back to Gemini API
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if api_key:
-        try:
-            decisions = classify_with_gemini_api(prompt, api_key)
-            print("  ✓ Processed via Gemini 2.5 Flash API.")
-            return decisions
-        except Exception as e:
-            print(f"  Gemini API error: {e}")
-
-    print("  ✗ No LLM available (Ollama offline & GEMINI_API_KEY unset). Leaving remaining mail untouched.")
-    return {}
 
 
 def organize_remaining_inbox_with_llm(service, config, label_cache):
@@ -498,21 +405,25 @@ def organize_remaining_inbox_with_llm(service, config, label_cache):
         headers = detail.get("payload", {}).get("headers", [])
         sender = next((h["value"] for h in headers if h["name"].lower() == "from"), "Unknown")
         subject = next((h["value"] for h in headers if h["name"].lower() == "subject"), "(No Subject)")
-        items.append({"id": m["id"], "from": sender, "subject": subject})
+        
+        # Guardrail: Never let the LLM touch or trash protected senders
+        if is_protected(sender):
+            print(f"  [Protected]: Keeping '{subject}' from {sender} in Inbox.")
+            continue
 
+        items.append({"id": m["id"], "from": sender, "subject": subject})
+        
     decisions = classify_inbox_items(items)
     for msg_id, label in decisions.items():
-        if label not in VALID_CATEGORIES or label == "INBOX_KEEP":
+        # Any item marked INBOX_KEEP, TRASH, or unrecognized is left untouched in the inbox
+        if label not in VALID_CATEGORIES or label in ("INBOX_KEEP", "TRASH"):
+            print(f"  [Kept in Inbox]: {msg_id}")
             continue
 
         label_id = get_or_create_label(service, label, label_cache)
-        if label == "TRASH":
-            batch_modify_messages(service, [msg_id], add_labels=["TRASH"])
-            print(f"  [Trash]: {msg_id}")
-        else:
-            batch_modify_messages(service, [msg_id], add_labels=[label_id], remove_labels=["INBOX"])
-            print(f"  [{label} -> Archived]: {msg_id}")
-
+        batch_modify_messages(service, [msg_id], add_labels=[label_id], remove_labels=["INBOX"])
+        print(f"  [{label} -> Archived]: {msg_id}")
+        
     print("  ✓ Dynamic classification complete.")
 
 
